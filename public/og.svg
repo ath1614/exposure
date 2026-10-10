@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="fire" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff7a18" />
+      <stop offset="0.5" stop-color="#e02a08" />
+      <stop offset="1" stop-color="#6d0a00" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#fire)" />
+  <rect x="80" y="78" width="34" height="4" fill="#fff4e6" />
+  <text x="80" y="120" font-family="Menlo, monospace" font-size="20" fill="#ffe4d1">URL EXPOSURE REPORT / 01</text>
+  <text x="80" y="290" font-family="Helvetica, Arial, sans-serif" font-size="104" font-weight="800" fill="#fff4e6" letter-spacing="-5">Every page</text>
+  <text x="80" y="395" font-family="Helvetica, Arial, sans-serif" font-size="104" font-weight="800" fill="#fff4e6" letter-spacing="-5">has a tell.</text>
+  <text x="80" y="500" font-family="Menlo, monospace" font-size="22" fill="#ffd9c4">scripts · cookies · headers · secrets · forms</text>
+  <rect x="80" y="540" width="1040" height="3" fill="#ffd9c4" opacity="0.6" />
+  <text x="80" y="590" font-family="Menlo, monospace" font-size="18" fill="#ffd9c4">one fetch, one report, no account</text>
+</svg>
