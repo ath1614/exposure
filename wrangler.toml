@@ -6,6 +6,9 @@ compatibility_date = "2026-10-01"
 directory = "./dist"
 binding = "ASSETS"
 not_found_handling = "single-page-application"
+# The asset router hands a navigation straight to index.html, which would skip the
+# share page entirely. These paths always go through the Worker first.
+run_worker_first = ["/api/*", "/r/*", "/report/*"]
 
 [[d1_databases]]
 binding = "DB"

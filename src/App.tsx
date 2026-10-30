@@ -92,7 +92,7 @@ function Chip({ grade }: { grade: Grade }) {
 
 function ReportView({ report, id }: { report: Report; id: string }) {
   const [copied, setCopied] = useState(false);
-  const link = `${location.origin}/?r=${id}`;
+  const link = `${location.origin}/r/${id}`;
 
   const copy = async () => {
     try {
@@ -200,7 +200,7 @@ function ReportView({ report, id }: { report: Report; id: string }) {
                   {header.present ? '✓' : '✕'}
                 </span>
                 <span className="header-name">{header.header}</span>
-                <span className="header-value">{header.value ?? 'not sent'}</span>
+                <span className="header-value">{header.value ?? header.note}</span>
               </li>
             ))}
           </ul>
@@ -315,7 +315,9 @@ function App() {
 
   useEffect(() => {
     void loadRecent();
-    const shared = new URLSearchParams(location.search).get('r');
+    const shared =
+      new URLSearchParams(location.search).get('r') ??
+      location.pathname.match(/^\/r\/([0-9a-z]{6,16})$/)?.[1];
     if (!shared) return;
     setStatus('loading');
     fetch(`/api/report/${shared}`)
@@ -327,6 +329,7 @@ function App() {
         setReport(data.report);
         setReportId(data.id ?? shared);
         setUrl(data.report.requestedUrl);
+        shouldScroll.current = true;
         setStatus('ready');
       })
       .catch((cause: Error) => {
@@ -366,7 +369,7 @@ function App() {
       setReportId(data.id);
       setStatus('ready');
       shouldScroll.current = true;
-      history.replaceState(null, '', `?r=${data.id}`);
+      history.replaceState(null, '', `/r/${data.id}`);
       void loadRecent();
     } catch (cause) {
       const err = cause as Error & { code?: string };
@@ -526,7 +529,7 @@ function App() {
                               setUrl(data.report.requestedUrl);
                               setStatus('ready');
                               shouldScroll.current = true;
-                              history.replaceState(null, '', `?r=${data.id ?? item.id}`);
+                              history.replaceState(null, '', `/r/${data.id ?? item.id}`);
                             })
                             .catch(() => {
                               setStatus('error');

@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { analyze } from '../core/analyze';
 import { ScanError, normalizeTarget } from '../core/guard';
+import { renderSharePage } from './share';
 import type { Env } from './env';
 import {
   bumpRate,
@@ -187,6 +188,66 @@ app.get('/api/report/:id', async (c) => {
 app.get('/api/recent', async (c) => {
   await ensureSchema(c.env.DB);
   return c.json({ scans: await recentScans(c.env.DB) });
+});
+
+app.get('/report/:id', (c) => c.redirect(`/r/${c.req.param('id')}`, 301));
+
+app.get('/r/:id', async (c) => {
+  const id = c.req.param('id');
+  const origin = new URL(c.req.url).origin;
+  const shell = await c.env.ASSETS.fetch(new Request(new URL('/index.html', c.req.url)));
+  const html = await shell.text();
+
+  if (!/^[0-9a-z]{6,16}$/.test(id)) {
+    return c.html(renderSharePage(html, { title: 'Not a report id · Exposure', description: 'Exposure reads one public URL and reports what it gives away.', url: origin, noindex: true }), 404);
+  }
+
+  await ensureSchema(c.env.DB);
+  const report = await loadScan(c.env.DB, id);
+  if (!report) {
+    return c.html(
+      renderSharePage(html, {
+        title: 'Report expired · Exposure',
+        description: 'Exposure keeps reports for 30 days. Scan the URL again to get a fresh one.',
+        url: `${origin}/r/${id}`,
+        noindex: true,
+      }),
+      404,
+    );
+  }
+
+  const parts = [
+    `${report.counts.trackers} tracker origin${report.counts.trackers === 1 ? '' : 's'}`,
+    `${report.counts.missingHeaders} of 6 security headers missing`,
+    report.counts.secrets > 0
+      ? `${report.counts.secrets} credential-shaped string${report.counts.secrets === 1 ? '' : 's'} in the markup`
+      : 'no credential-shaped strings in the markup',
+  ];
+  const summary = [
+    `${report.host} scored ${report.score}/100 (${report.grade}).`,
+    `Read on ${new Date(report.fetchedAt).toISOString().slice(0, 10)}.`,
+    '',
+    ...parts.map((part) => `- ${part}`),
+    '',
+    'Why this grade:',
+    ...(report.deductions.length === 0
+      ? ['- nothing came off']
+      : report.deductions.map((item) => `- ${item.label}: -${item.points} (${item.detail})`)),
+  ].join('\n');
+
+  const description = `Score ${report.score}/100 (${report.grade}) for ${report.host}: ${parts.join(', ')}.`;
+
+  return c.html(
+    renderSharePage(html, {
+      title: `${report.host} scores ${report.score}/100 (${report.grade}) · Exposure`,
+      description,
+      url: `${origin}/r/${id}`,
+      summary,
+      noindex: false,
+    }),
+    200,
+    { 'cache-control': 'public, max-age=600' },
+  );
 });
 
 app.all('*', (c) => c.env.ASSETS.fetch(c.req.raw));
