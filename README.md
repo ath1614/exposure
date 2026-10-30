@@ -88,7 +88,8 @@ the resolved IP and connect to it directly. This is stated in the UI too.
 - **Worker**: Hono, TypeScript, deployed as an ES module Worker.
 - **D1**: `scans` and `scan_rate`; the schema is created by `ensureSchema()` on first request.
 - **Frontend**: Vite + React 19, no router — the report id lives in `?r=`.
-- **Tests**: Vitest, 32 tests over the parser, the score, the cookie flags and the SSRF guard.
+- **Tests**: Vitest, 39 tests over the parser, the score, the cookie flags, the SSRF guard and the share page.
+- **Share pages**: `/r/:id` is rendered by the Worker, not by the browser — the score and the top findings go into the Open Graph tags and a `<noscript>` block, so a link pasted into chat previews with its number.
 
 ## Development
 
