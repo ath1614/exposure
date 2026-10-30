@@ -6,7 +6,7 @@ Paste a URL. Exposure fetches it the way a stranger would, then itemises what th
 hands over: third-party scripts, tracker pixels, cookies, missing headers, form destinations,
 and key-shaped strings left in the markup.
 
-[Run a report](https://site-a2ea171641a94e8aad3645271be64d6c.freebuff.page) · MIT
+[Run a report](https://exposure.ath1614.workers.dev) · MIT
 
 ---
 
